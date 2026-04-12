@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EchoLab — Intelligence Platform</title>
+
+    <!-- Fonts: Inter instead of DM/Serif based on Stitch reference -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+        rel="stylesheet">
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;500;600&display=swap"
+        rel="stylesheet" />
+
+    <style>
+        /* ─── DESIGN TOKENS (Merged V1 + Stitch Reference) ─── */
+        :root {
+            /* Brand palette from Stitch */
+            --primary: #f3536e;
+            --primary-dark: #802432;
+            --primary-light: rgba(243, 83, 110, 0.1);
+            --accent-teal: #0e7c8e;
+            --accent-teal-dim: rgba(14, 124, 142, 0.1);
+
+            /* Neutrals */
+            --ink: #0f172a;
+            /* Slate 900 */
+            --ink-80: rgba(15, 23, 42, 0.80);
+            --ink-50: #64748b;
+            /* Slate 500 */
+            --ink-30: #94a3b8;
+            /* Slate 400 */
+
+            /* Backgrounds & Surfaces */
+            --bg: #f8f9fa;
+            /* background-light */
+            --bg-2: #ffffff;
+            --surface: rgba(255, 255, 255, 0.6);
+            --border: rgba(0, 0, 0, 0.08);
+            /* editorial-border */
+
+            /* Typography */
+            --font-main: 'Inter', system-ui, sans-serif;
+
+            /* Radius */
+            --r-sm: 8px;
+            --r-md: 12px;
+            --r-lg: 16px;
+            --r-xl: 24px;
+            --r-pill: 9999px;
+
+            /* Transitions */
+            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        [data-theme="dark"] {
+            --ink: #f8fafc;
+            --ink-80: rgba(248, 250, 252, 0.80);
+            --ink-50: #94a3b8;
+            --ink-30: #64748b;
+            --bg: #020617;
+            /* Slate 950 */
+            --bg-2: #0f172a;
+            /* Slate 900 */
+            --surface: rgba(30, 41, 59, 0.6);
+            --border: rgba(255, 255, 255, 0.08);
+            --primary-light: rgba(243, 83, 110, 0.15);
+        }
+
+        /* ─── RESET ─── */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg);
+            color: var(--ink);
+            overflow-x: hidden;
+            transition: background 0.4s var(--ease), color 0.4s var(--ease);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* ─── UTILITIES & ANIMATIONS ─── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.75s var(--ease), transform 0.75s var(--ease);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-delay-1 {
+            transition-delay: 0.1s;
+        }
+
+        .reveal-delay-2 {
+            transition-delay: 0.2s;
+        }
+
+        .reveal-delay-3 {
+            transition-delay: 0.3s;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* ─── NAV ─── */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 16px 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            transition: background 0.4s var(--ease), border-color 0.4s var(--ease);
+        }
+
+        [data-theme="dark"] nav {
+            background: rgba(2, 6, 23, 0.8);
+        }
+
+        .nav-logo {
+            font-size: 20px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.05em;
+            color: var(--ink);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-logo .material-symbols-outlined {
+            color: var(--primary);
+            font-size: 28px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--ink-50);
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        /* Theme toggle */
+        .theme-toggle {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--r-pill);
+            border: 1px solid var(--border);
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            color: var(--ink-50);
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--ink-30);
+            color: var(--ink);
+        }
+
+        .theme-toggle .material-symbols-outlined {
+            font-size: 18px;
+        }
+
+        .icon-sun {
+            display: none;
+        }
+
+        [data-theme="dark"] .icon-moon {
+            display: none;
+        }
+
+        [data-theme="dark"] .icon-sun {
+            display: block;
+        }
+
+        .nav-cta {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 10px 24px;
+            border-radius: var(--r-pill);
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .nav-cta:hover {
+            opacity: 0.9;
+        }
+
+        /* ─── HERO ─── */
+        .hero {
+            min-height: 100vh;
+            padding: 140px 64px 80px;
+            max-width: 1360px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .hero-copy {}
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: var(--r-pill);
+            border: 1px solid rgba(243, 83, 110, 0.3);
+            background: var(--primary-light);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 32px;
+        }
+
+        .eyebrow-dot {
+            position: relative;
+            display: flex;
+            width: 8px;
+            height: 8px;
+        }
+
+        .eyebrow-dot::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: var(--primary);
+            opacity: 0.75;
+            animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+
+        .eyebrow-dot::after {
+            content: '';
+            position: relative;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+        }
+
+        @keyframes ping {
+
+            75%,
+            100% {
+                transform: scale(3.5);
+                opacity: 0;
+            }
+        }
+
+        .hero-h1 {
+            font-size: clamp(48px, 6vw, 92px);
+            font-weight: 900;
+            line-height: 0.95;
+            letter-spacing: -0.04em;
+            text-transform: uppercase;
+            font-style: italic;
+            color: var(--ink);
+            margin-bottom: 32px;
+        }
+
+        .hero-h1 span {
+            font-style: normal;
+            color: var(--primary);
+        }
+
+        .hero-p {
+            font-size: 18px;
+            line-height: 1.6;
+            color: var(--ink-50);
+            max-width: 500px;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            padding: 16px 36px;
+            border-radius: var(--r-pill);
+            background: var(--primary);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border: none;
+            cursor: pointer;
+            transition: all 0.22s var(--ease);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(243, 83, 110, 0.3);
+        }
+
+        .btn-primary .material-symbols-outlined {
+            font-size: 18px;
+            transition: transform 0.2s;
+        }
+
+        .btn-primary:hover .material-symbols-outlined {
+            transform: translateX(3px);
+        }
+
+        .btn-ghost {
+            padding: 16px 36px;
+            border-radius: var(--r-pill);
+            background: transparent;
+            color: var(--ink);
+            border: 1px solid var(--border);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        [data-theme="dark"] .btn-ghost {
+            background: var(--surface);
+            color: var(--ink);
+        }
+
+        .btn-ghost:hover {
+            background: var(--border);
+        }
+
+        /* ─── HERO VISUAL — Cinematic Image + Floating Data Widget ─── */
+        .hero-visual {
+            position: relative;
+            height: 600px;
+            border-radius: var(--r-xl);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .artist-photo-bg {
+            position: absolute;
+            inset: 0;
+            border-radius: var(--r-xl);
+            overflow: hidden;
+            background: var(--bg-2);
+        }
+
+        .artist-photo-bg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.7s var(--ease);
+        }
+
+        .hero-visual:hover .artist-photo-bg img {
+            transform: scale(1.05);
+        }
+
+        .hero-visual::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--r-xl);
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent 50%);
+            pointer-events: none;
+        }
+
+        .artist-name-tag {
+            position: absolute;
+            bottom: 32px;
+            left: 32px;
+            z-index: 10;
+        }
+
+        .artist-name-tag p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 4px;
+        }
+
+        .artist-name-tag h3 {
+            color: #fff;
+            font-size: 32px;
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+
+        /* Glass Widget from Stitch Reference */
+        .glass-widget {
+            position: absolute;
+            bottom: -24px;
+            left: -24px;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(243, 83, 110, 0.15);
+            border-radius: var(--r-lg);
+            padding: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            z-index: 20;
+        }
+
+        [data-theme="dark"] .glass-widget {
+            background: rgba(15, 23, 42, 0.75);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .gw-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .gw-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gw-info p:first-child {
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--ink-50);
+            letter-spacing: 0.1em;
+        }
+
+        .gw-info p:last-child {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--ink);
+            line-height: 1;
+        }
+
+        /* CSS Bar Chart */
+        .gw-chart {
+            display: flex;
+            gap: 4px;
+            height: 32px;
+            align-items: flex-end;
+        }
+
+        .bar {
+            width: 8px;
+            background: var(--primary-light);
+            border-radius: 2px 2px 0 0;
+        }
+
+        .bar.active {
+            background: var(--primary);
+        }
+
+        .bar-1 {
+            height: 40%;
+        }
+
+        .bar-2 {
+            height: 75%;
+        }
+
+        .bar-3 {
+            height: 35%;
+        }
+
+        .bar-4 {
+            height: 100%;
+        }
+
+        .bar-5 {
+            height: 60%;
+        }
+
+        [data-theme="dark"] .bar {
+            background: rgba(243, 83, 110, 0.2);
+        }
+
+        /* ─── METRICS BAR ─── */
+        .metrics-section {
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-2);
+        }
+
+        .metrics-inner {
+            max-width: 1360px;
+            margin: 0 auto;
+            padding: 40px 64px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+        }
+
+        .metric-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .m-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--primary);
+        }
+
+        .m-value {
+            font-size: 36px;
+            font-weight: 900;
+            color: var(--ink);
+            line-height: 1.1;
+        }
+
+        .m-delta {
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .m-delta.up {
+            color: #10b981;
+        }
+
+        .m-delta.down {
+            color: #f43f5e;
+        }
+
+        .m-delta .material-symbols-outlined {
+            font-size: 14px;
+        }
+
+        /* ─── SECTION COMMON ─── */
+        section {
+            padding: 96px 64px;
+        }
+
+        .section-inner {
+            max-width: 1360px;
+            margin: 0 auto;
+        }
+
+        .section-eyebrow {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: clamp(32px, 4vw, 56px);
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 0.95;
+            color: var(--ink);
+            letter-spacing: -0.04em;
+            margin-bottom: 32px;
+        }
+
+        .section-title em {
+            font-style: italic;
+            color: var(--ink);
+            opacity: 0.6;
+        }
+
+        /* ─── PROCESS / ECOSYSTEM CARDS ─── */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+        }
+
+        .feat-card {
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: var(--r-xl);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 440px;
+            cursor: default;
+            transition: all 0.3s var(--ease);
+        }
+
+        .feat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+        }
+
+        .feat-card.c1 {
+            border-top: 4px solid var(--primary);
+        }
+
+        .feat-card.c2 {
+            border-top: 4px solid var(--accent-teal);
+        }
+
+        .feat-card.c3 {
+            border-top: 4px solid var(--primary-dark);
+        }
+
+        .fc-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: var(--r-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 32px;
+        }
+
+        .feat-card.c1 .fc-icon {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .feat-card.c2 .fc-icon {
+            background: var(--accent-teal-dim);
+            color: var(--accent-teal);
+        }
+
+        .feat-card.c3 .fc-icon {
+            background: rgba(128, 36, 50, 0.1);
+            color: var(--primary-dark);
+        }
+
+        .fc-icon .material-symbols-outlined {
+            font-size: 28px;
+        }
+
+        .fc-title {
+            font-size: 24px;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: var(--ink);
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+
+        .fc-body {
+            font-size: 15px;
+            color: var(--ink-50);
+            font-weight: 400;
+            line-height: 1.6;
+            flex: 1;
+        }
+
+        .fc-footer {
+            border-top: 1px solid var(--border);
+            padding-top: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .fc-tag {
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .feat-card.c1 .fc-tag {
+            color: var(--primary);
+        }
+
+        .feat-card.c2 .fc-tag {
+            color: var(--accent-teal);
+        }
+
+        .feat-card.c3 .fc-tag {
+            color: var(--primary-dark);
+        }
+
+        .fc-footer .material-symbols-outlined {
+            font-size: 20px;
+            opacity: 0.5;
+            transition: transform 0.2s;
+        }
+
+        .feat-card:hover .fc-footer .material-symbols-outlined {
+            transform: translate(4px, -4px);
+            opacity: 1;
+        }
+
+        .feat-card.c1:hover .fc-footer .material-symbols-outlined {
+            color: var(--primary);
+        }
+
+        .feat-card.c2:hover .fc-footer .material-symbols-outlined {
+            color: var(--accent-teal);
+        }
+
+        .feat-card.c3:hover .fc-footer .material-symbols-outlined {
+            color: var(--primary-dark);
+        }
+
+        /* ─── BILLBOARD CHARTS / DELIVERABLE TABLE ─── */
+        .chart-section {
+            background: var(--bg-2);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 48px;
+        }
+
+        .th-filters {
+            display: flex;
+            gap: 16px;
+        }
+
+        .filter-btn {
+            padding: 8px 24px;
+            border-radius: var(--r-pill);
+            border: 1px solid var(--border);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--ink);
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        .filter-btn:not(.active):hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .data-table-wrapper {
+            border-top: 4px solid var(--ink);
+            overflow-x: auto;
+        }
+
+        [data-theme="dark"] .data-table-wrapper {
+            border-top-color: #fff;
+        }
+
+        .data-table {
+            w-full;
+            border-collapse: collapse;
+            width: 100%;
+            text-align: left;
+        }
+
+        .data-table th {
+            padding: 24px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--ink-30);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table tr {
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .data-table tbody tr:hover {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        [data-theme="dark"] .data-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .data-table tbody tr {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table td {
+            padding: 32px 16px;
+        }
+
+        .td-rank {
+            font-size: 36px;
+            font-weight: 900;
+            font-style: italic;
+            color: var(--ink-30);
+            opacity: 0.3;
+            transition: all 0.2s;
+            width: 80px;
+        }
+
+        .data-table tr:hover .td-rank {
+            opacity: 1;
+            color: var(--primary);
+        }
+
+        .td-artist {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .td-artist-img {
+            width: 64px;
+            height: 64px;
+            border-radius: var(--r-sm);
+            background: var(--bg);
+            overflow: hidden;
+        }
+
+        .td-artist-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .td-artist-info h5 {
+            font-size: 20px;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: var(--ink);
+            margin-bottom: 2px;
+        }
+
+        .td-artist-info p {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--ink-50);
+        }
+
+        .td-score {
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            color: var(--ink);
+        }
+
+        .td-growth {
+            width: 200px;
+        }
+
+        .growth-bar {
+            width: 120px;
+            height: 8px;
+            background: var(--border);
+            border-radius: var(--r-pill);
+            overflow: hidden;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 12px;
+        }
+
+        .growth-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: var(--r-pill);
+        }
+
+        .td-growth span {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .td-action {
+            text-align: right;
+        }
+
+        .action-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: var(--ink-50);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .data-table tr:hover .action-btn {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        /* ─── CTA SECTION ─── */
+        .cta-section {
+            position: relative;
+            padding: 120px 64px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .cta-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .cta-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--primary);
+            opacity: 0.05;
+            mix-blend-mode: overlay;
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .cta-title {
+            font-size: clamp(40px, 6vw, 72px);
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 0.9;
+            margin-bottom: 24px;
+            color: var(--ink);
+            letter-spacing: -0.04em;
+        }
+
+        .cta-body {
+            font-size: 20px;
+            font-weight: 300;
+            color: var(--ink-50);
+            margin-bottom: 48px;
+        }
+
+        .cta-actions {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+        }
+
+        .btn-large {
+            padding: 24px 48px;
+            border-radius: var(--r-pill);
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-large.primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-large.primary:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-large.outline {
+            border: 2px solid var(--ink);
+            background: transparent;
+            color: var(--ink);
+        }
+
+        [data-theme="dark"] .btn-large.outline {
+            border-color: #fff;
+            color: #fff;
+        }
+
+        .btn-large.outline:hover {
+            background: var(--ink);
+            color: var(--bg);
+        }
+
+        /* ─── FOOTER ─── */
+        footer {
+            background: var(--bg-2);
+            border-top: 1px solid var(--border);
+            padding: 80px 64px 40px;
+        }
+
+        .footer-inner {
+            max-width: 1360px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 64px;
+            margin-bottom: 80px;
+        }
+
+        .footer-logo {
+            font-size: 24px;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: var(--ink);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .footer-logo .material-symbols-outlined {
+            color: var(--primary);
+            font-size: 32px;
+        }
+
+        .footer-desc {
+            font-size: 14px;
+            font-weight: 300;
+            color: var(--ink-50);
+            line-height: 1.6;
+            max-width: 300px;
+        }
+
+        .footer-col h5 {
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--ink);
+            margin-bottom: 32px;
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .footer-links a {
+            font-size: 14px;
+            font-weight: 300;
+            color: var(--ink-50);
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid var(--border);
+            padding-top: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-bottom p {
+            font-size: 14px;
+            font-weight: 300;
+            color: var(--ink-50);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <div class="nav-logo">
+            <span class="material-symbols-outlined">analytics</span>
+            EchoLab
+        </div>
+        <ul class="nav-links">
+            <li><a href="#artistas">Artistas</a></li>
+            <li><a href="#metodologia">Metodología</a></li>
+            <li><a href="#servicios">Servicios</a></li>
+        </ul>
+        <div class="nav-right">
+            <button class="theme-toggle" onclick="toggleTheme()" title="Cambiar tema">
+                <span class="material-symbols-outlined icon-moon">dark_mode</span>
+                <span class="material-symbols-outlined icon-sun">light_mode</span>
+            </button>
+            <button class="nav-cta">Solicitar Diagnóstico</button>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-copy reveal">
+            <div class="hero-eyebrow">
+                <span class="eyebrow-dot"></span>
+                Live Market Intelligence
+            </div>
+            <h1 class="hero-h1">The New Era of<br><span>Artist</span> Intelligence.</h1>
+            <p class="hero-p">Conversión de analíticas crudas de Spotify y Chartmetric en un roadmap editorial curado,
+                artesanal y guiado por analítica de precisión.</p>
+            <div class="hero-actions">
+                <button class="btn-primary">
+                    Start Your Journey
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                </button>
+                <button class="btn-ghost">View Methodology</button>
+            </div>
+        </div>
+
+        <div class="hero-visual reveal reveal-delay-2">
+            <div class="artist-photo-bg">
+                <img src="https://images.unsplash.com/photo-1516280440502-c94158914bed?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
+                    alt="Artist cinematic portrait">
+            </div>
+            <div class="artist-name-tag">
+                <p>Artist Spotlight</p>
+                <h3>Maya Kalu</h3>
+            </div>
+            <!-- Floating Data Widget -->
+            <div class="glass-widget">
+                <div class="gw-header">
+                    <div class="gw-icon">
+                        <span class="material-symbols-outlined">trending_up</span>
+                    </div>
+                    <div class="gw-info">
+                        <p>Growth Yield</p>
+                        <p>+142.8%</p>
+                    </div>
+                </div>
+                <div class="gw-chart">
+                    <div class="bar bar-1"></div>
+                    <div class="bar bar-2"></div>
+                    <div class="bar bar-3"></div>
+                    <div class="bar bar-4 active"></div>
+                    <div class="bar bar-5"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- METRICS BAR -->
+    <div class="metrics-section">
+        <div class="metrics-inner">
+            <div class="metric-item reveal">
+                <span class="m-label">Listeners / Mo</span>
+                <span class="m-value">847.2K</span>
+                <span class="m-delta up"><span class="material-symbols-outlined">north_east</span> +12% MoM</span>
+            </div>
+            <div class="metric-item reveal reveal-delay-1">
+                <span class="m-label">Data Points</span>
+                <span class="m-value">1.8B</span>
+                <span class="m-delta up"><span class="material-symbols-outlined">north_east</span> +5% Daily</span>
+            </div>
+            <div class="metric-item reveal reveal-delay-2">
+                <span class="m-label">Conversion</span>
+                <span class="m-value">68%</span>
+                <span class="m-delta up"><span class="material-symbols-outlined">north_east</span> Optimized</span>
+            </div>
+            <div class="metric-item reveal reveal-delay-3">
+                <span class="m-label">Reach Score</span>
+                <span class="m-value">74.2</span>
+                <span class="m-delta down"><span class="material-symbols-outlined">south_east</span> Percentil 82</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- DATA CHARTS (Replaces typical process steps with a more brutalist table) -->
+    <section class="chart-section" id="artistas">
+        <div class="section-inner">
+            <div class="table-header reveal">
+                <div>
+                    <h2 class="section-eyebrow">Market Index</h2>
+                    <h3 class="section-title" style="margin:0;">The EchoLab <em>100</em></h3>
+                </div>
+                <div class="th-filters">
+                    <button class="filter-btn active">Streaming</button>
+                    <button class="filter-btn">Social Viral</button>
+                    <button class="filter-btn">Radio</button>
+                </div>
+            </div>
+
+            <div class="data-table-wrapper reveal reveal-delay-1">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Artist</th>
+                            <th>Echo Score</th>
+                            <th>Growth Rate</th>
+                            <th style="text-align: right;">Insights</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="td-rank">01</td>
+                            <td class="td-artist">
+                                <div class="td-artist-img"><img
+                                        src="https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&w=200&q=80"
+                                        alt="Luna"></div>
+                                <div class="td-artist-info">
+                                    <h5>Luna Shadows</h5>
+                                    <p>Alternative Pop</p>
+                                </div>
+                            </td>
+                            <td class="td-score">98.4</td>
+                            <td class="td-growth">
+                                <div class="growth-bar">
+                                    <div class="growth-fill" style="width: 88%"></div>
+                                </div>
+                                <span>+14.2%</span>
+                            </td>
+                            <td class="td-action">
+                                <button class="action-btn"><span
+                                        class="material-symbols-outlined">analytics</span></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="td-rank">02</td>
+                            <td class="td-artist">
+                                <div class="td-artist-img"><img
+                                        src="https://images.unsplash.com/photo-1493225457124-a1a2a5f5f9af?auto=format&fit=crop&w=200&q=80"
+                                        alt="Echo"></div>
+                                <div class="td-artist-info">
+                                    <h5>Echo Theory</h5>
+                                    <p>Electronic / Synth</p>
+                                </div>
+                            </td>
+                            <td class="td-score">94.1</td>
+                            <td class="td-growth">
+                                <div class="growth-bar">
+                                    <div class="growth-fill" style="width: 76%"></div>
+                                </div>
+                                <span>+9.1%</span>
+                            </td>
+                            <td class="td-action">
+                                <button class="action-btn"><span
+                                        class="material-symbols-outlined">analytics</span></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="td-rank">03</td>
+                            <td class="td-artist">
+                                <div class="td-artist-img"><img
+                                        src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=200&q=80"
+                                        alt="Velvet"></div>
+                                <div class="td-artist-info">
+                                    <h5>Velvet Pulse</h5>
+                                    <p>Modern Soul</p>
+                                </div>
+                            </td>
+                            <td class="td-score">91.8</td>
+                            <td class="td-growth">
+                                <div class="growth-bar">
+                                    <div class="growth-fill" style="width: 72%"></div>
+                                </div>
+                                <span>+11.5%</span>
+                            </td>
+                            <td class="td-action">
+                                <button class="action-btn"><span
+                                        class="material-symbols-outlined">analytics</span></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- CORE ECOSYSTEM (Feature Glass Cards) -->
+    <section id="metodologia">
+        <div class="section-inner text-center">
+            <div class="reveal">
+                <h2 class="section-eyebrow text-center" style="text-align:center;">Core Ecosystem</h2>
+                <h3 class="section-title text-center" style="text-align:center;">Engineered for <em>Momentum</em></h3>
+            </div>
+
+            <div class="features-grid">
+                <!-- Card 1 -->
+                <div class="feat-card c1 reveal">
+                    <div>
+                        <div class="fc-icon"><span class="material-symbols-outlined">hub</span></div>
+                        <h4 class="fc-title">Predictive Momentum Analysis</h4>
+                        <p class="fc-body">Nuestra IA identifica patrones de crecimiento antes de que exploten. Cruzamos
+                            tus datos reales con tendencias del mercado para invertir esfuerzo donde más importa.</p>
+                    </div>
+                    <div class="fc-footer">
+                        <span class="fc-tag">Efficiency +84%</span>
+                        <span class="material-symbols-outlined">arrow_outward</span>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="feat-card c2 reveal reveal-delay-1">
+                    <div>
+                        <div class="fc-icon"><span class="material-symbols-outlined">query_stats</span></div>
+                        <h4 class="fc-title">Audience Sentiment Mapping</h4>
+                        <p class="fc-body">Ve más allá de los likes y los plays básicos. Mapeamos la resonancia
+                            emocional y la demografía global de tus lanzamientos en tiempo real.</p>
+                    </div>
+                    <div class="fc-footer">
+                        <span class="fc-tag">Precision 99.2%</span>
+                        <span class="material-symbols-outlined">arrow_outward</span>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="feat-card c3 reveal reveal-delay-2">
+                    <div>
+                        <div class="fc-icon"><span class="material-symbols-outlined">language</span></div>
+                        <h4 class="fc-title">Global Network Optimization</h4>
+                        <p class="fc-body">Accede a recomendaciones exactas de curators, medios y A&Rs que están
+                            específicamente alineados y pareados con la identidad de tu proyecto musical.</p>
+                    </div>
+                    <div class="fc-footer">
+                        <span class="fc-tag">Verified Assets Only</span>
+                        <span class="material-symbols-outlined">arrow_outward</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA SECTION -->
+    <section class="cta-section">
+        <div class="cta-bg"></div>
+        <div class="cta-content reveal">
+            <h2 class="cta-title">Ready to scale<br>your sound?</h2>
+            <p class="cta-body">Únete a la plataforma elegida por artistas en crecimiento acelerado para transformar su
+                data bruta en planes de acción editorial.</p>
+            <div class="cta-actions">
+                <button class="btn-large primary">Crear Perfil Profesional</button>
+                <button class="btn-large outline">Solicitar un Demo</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-inner">
+            <div class="footer-col" style="grid-column: span 1;">
+                <div class="footer-logo">
+                    <span class="material-symbols-outlined">analytics</span>
+                    EchoLab
+                </div>
+                <p class="footer-desc">La principal agencia de inteligencia para la próxima generación de íconos
+                    musicales. Data driven, artist inspired.</p>
+            </div>
+            <div class="footer-col">
+                <h5>Platform</h5>
+                <ul class="footer-links">
+                    <li><a href="#">Global Charts</a></li>
+                    <li><a href="#">Artist Tools</a></li>
+                    <li><a href="#">Curator Network</a></li>
+                    <li><a href="#">Pricing Plans</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h5>Company</h5>
+                <ul class="footer-links">
+                    <li><a href="#">Our Story</a></li>
+                    <li><a href="#">Data Privacy</a></li>
+                    <li><a href="#">Contact Support</a></li>
+                    <li><a href="#">Careers</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h5>Legal</h5>
+                <ul class="footer-links">
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 EchoLab Intelligence Group. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        /* THEME TOGGLE */
+        function toggleTheme() {
+            const html = document.documentElement;
+            html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+        }
+
+        /* REVEAL ANIMATIONS ON SCROLL */
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.12 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        /* NAV SCRIM */
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 20) {
+                nav.style.boxShadow = '0 1px 24px rgba(0,0,0,0.07)';
+            } else {
+                nav.style.boxShadow = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>

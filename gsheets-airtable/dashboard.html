@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EchoLab — Rubimente · Data Visualization</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pt: #1a7a8e;
+            --pt-deep: #0e4a57;
+            --pt-glow: rgba(26, 122, 142, .12);
+            --sa: #f4455a;
+            --sa-mid: #d93549;
+            --green: #2a8c60;
+            --gold: #c8842a;
+            --bg: #0b0f17;
+            --bg-panel: #131924;
+            --bg-card: #1a2233;
+            --bg-hover: #202c3e;
+            --border: rgba(255, 255, 255, .055);
+            --border-2: rgba(255, 255, 255, .10);
+            --text: #e4eaf6;
+            --text-2: #7e8fa8;
+            --text-3: #4a5870;
+            --r: 12px;
+            --T: .18s ease;
+        }
+
+        [data-theme="light"] {
+            --bg: #eef0f5;
+            --bg-panel: #fff;
+            --bg-card: #fff;
+            --bg-hover: #f4f6fb;
+            --border: rgba(0, 0, 0, .065);
+            --border-2: rgba(0, 0, 0, .11);
+            --text: #0f1828;
+            --text-2: #4a5568;
+            --text-3: #9ca3af;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { font-size: 14px; overflow: hidden; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            transition: background var(--T), color var(--T);
+        }
+
+        button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+        /* ══ TOPBAR ══ */
+        .topbar {
+            height: 72px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-panel);
+            display: flex;
+            align-items: center;
+            padding: 0 28px;
+            gap: 16px;
+            flex-shrink: 0;
+            transition: background var(--T);
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            flex: 1;
+        }
+
+        .logo-img {
+            height: 56px;
+            object-fit: contain;
+        }
+
+        .logo-dark { display: block; }
+        .logo-light { display: none; }
+        [data-theme="light"] .logo-dark { display: none; }
+        [data-theme="light"] .logo-light { display: block; }
+
+        .tb-divider {
+            width: 1px;
+            height: 28px;
+            background: var(--border-2);
+            flex-shrink: 0;
+        }
+
+        .tb-artist {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .tb-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: 8px;
+        }
+
+        .tb-status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 6px rgba(42, 140, 96, .6);
+            animation: pulse-green 2.4s ease infinite;
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .5; transform: scale(.8); }
+        }
+
+        .tb-live-lbl {
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--green);
+            letter-spacing: .6px;
+            text-transform: uppercase;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 7px;
+            transition: all var(--T);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-ghost {
+            border: 1px solid var(--border-2);
+            color: var(--text-2);
+            background: none;
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--pt);
+            color: var(--pt);
+        }
+
+        .btn-help {
+            border: 1px solid rgba(26, 122, 142, .25);
+            color: var(--pt);
+            background: var(--pt-glow);
+        }
+
+        .btn-help:hover {
+            background: rgba(26, 122, 142, .2);
+        }
+
+        .theme-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 7px;
+            border: 1px solid var(--border-2);
+            background: none;
+            color: var(--text-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--T);
+        }
+
+        .theme-btn:hover {
+            border-color: var(--pt);
+            color: var(--pt);
+        }
+
+        .theme-btn svg { width: 14px; height: 14px; }
+
+        /* ══ CONTENT — IFRAME ══ */
+        .content-frame {
+            flex: 1;
+            min-height: 0;
+            position: relative;
+        }
+
+        .content-frame iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .iframe-loading {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            z-index: 10;
+            transition: opacity .4s ease;
+        }
+
+        .iframe-loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader-ring {
+            width: 28px;
+            height: 28px;
+            border: 2.5px solid var(--border);
+            border-top-color: var(--pt);
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+            margin-bottom: 12px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loader-text {
+            font-size: 12px;
+            color: var(--text-3);
+            font-weight: 500;
+        }
+
+        /* ══ GLOSSARY PANEL ══ */
+        .glossary-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .5);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .25s ease;
+        }
+
+        .glossary-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .glossary-panel {
+            position: fixed;
+            top: 0;
+            right: -520px;
+            width: 500px;
+            max-width: 90vw;
+            height: 100vh;
+            background: var(--bg-panel);
+            border-left: 1px solid var(--border);
+            z-index: 101;
+            display: flex;
+            flex-direction: column;
+            transition: right .3s cubic-bezier(.4, 0, .2, 1);
+            box-shadow: -8px 0 32px rgba(0, 0, 0, .3);
+        }
+
+        .glossary-panel.open {
+            right: 0;
+        }
+
+        .glossary-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .glossary-title {
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: -.3px;
+        }
+
+        .glossary-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid var(--border-2);
+            color: var(--text-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all var(--T);
+        }
+
+        .glossary-close:hover {
+            border-color: var(--sa);
+            color: var(--sa);
+        }
+
+        .glossary-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .glossary-body::-webkit-scrollbar { width: 4px; }
+        .glossary-body::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 2px; }
+
+        .g-section {
+            margin-bottom: 28px;
+        }
+
+        .g-section-title {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1.1px;
+            text-transform: uppercase;
+            color: var(--text-3);
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .g-item {
+            margin-bottom: 16px;
+        }
+
+        .g-term {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .g-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .g-def {
+            font-size: 12px;
+            color: var(--text-2);
+            line-height: 1.65;
+            padding-left: 14px;
+        }
+
+        .g-example {
+            font-size: 11px;
+            color: var(--text-3);
+            padding-left: 14px;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        .g-tag {
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 4px;
+            letter-spacing: .3px;
+        }
+
+        .g-tag-stream { background: rgba(29, 185, 84, .12); color: #1db954; }
+        .g-tag-social { background: rgba(225, 48, 108, .12); color: #e1306c; }
+        .g-tag-ai { background: rgba(168, 85, 247, .12); color: #a855f7; }
+        .g-tag-score { background: rgba(200, 132, 42, .12); color: var(--gold); }
+
+        /* Fullscreen */
+        body:fullscreen .topbar { display: none; }
+        body:-webkit-full-screen .topbar { display: none; }
+
+        /* ══ VIEW TABS ══ */
+        .view-tabs {
+            display: flex;
+            gap: 2px;
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 3px;
+            margin-left: 16px;
+        }
+
+        .view-tab {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 6px 16px;
+            border-radius: 6px;
+            color: var(--text-3);
+            transition: all var(--T);
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+
+        .view-tab:hover {
+            color: var(--text-2);
+        }
+
+        .view-tab.active {
+            background: var(--bg-panel);
+            color: var(--text);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
+        }
+
+        @media (max-width: 640px) {
+            .topbar { padding: 0 14px; height: 56px; flex-wrap: wrap; }
+            .logo-img { height: 40px; }
+            .tb-artist { font-size: 13px; }
+            .view-tabs { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <img src="echolab_darkmode.png" alt="EchoLab" class="logo-img logo-dark">
+            <img src="echolab_lightmode.png" alt="EchoLab" class="logo-img logo-light">
+            <span class="tb-divider"></span>
+            <span class="tb-artist">Rubimente</span>
+            <div class="tb-status">
+                <span class="tb-status-dot"></span>
+                <span class="tb-live-lbl">Live</span>
+            </div>
+            <div class="view-tabs">
+                <button class="view-tab active" onclick="switchView(this, 'https://airtable.com/embed/appsfMuYOIzaIVg4E/shre0CxbAjHqYndYR')">Data Visualization</button>
+                <button class="view-tab" onclick="switchView(this, 'https://airtable.com/embed/appsfMuYOIzaIVg4E/shryur0q0J9yRpYoA')">Content Score</button>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="btn btn-help" onclick="openGlossary()">📖 Glosario</button>
+            <button class="btn btn-ghost" onclick="document.querySelector('.airtable-embed').src = document.querySelector('.airtable-embed').src">↻ Refresh</button>
+            <button class="btn btn-ghost" onclick="toggleFullscreen()">⛶ Expandir</button>
+            <button class="theme-btn" onclick="toggleTheme()" title="Cambiar tema">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <circle cx="12" cy="12" r="5"/>
+                    <line x1="12" y1="1" x2="12" y2="3"/>
+                    <line x1="12" y1="21" x2="12" y2="23"/>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                    <line x1="1" y1="12" x2="3" y2="12"/>
+                    <line x1="21" y1="12" x2="23" y2="12"/>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="content-frame">
+        <div class="iframe-loading" id="iframeLoader">
+            <div class="loader-ring"></div>
+            <div class="loader-text">Cargando dashboard...</div>
+        </div>
+        <iframe 
+            class="airtable-embed"
+            src="https://airtable.com/embed/appsfMuYOIzaIVg4E/shre0CxbAjHqYndYR"
+            frameborder="0"
+            onmousewheel=""
+            onload="document.getElementById('iframeLoader').classList.add('hidden')"
+        ></iframe>
+    </div>
+
+    <!-- ══ GLOSSARY PANEL ══ -->
+    <div class="glossary-overlay" id="glossaryOverlay" onclick="closeGlossary()"></div>
+    <div class="glossary-panel" id="glossaryPanel">
+        <div class="glossary-header">
+            <span class="glossary-title">📖 Glosario de Métricas</span>
+            <button class="glossary-close" onclick="closeGlossary()">✕</button>
+        </div>
+        <div class="glossary-body">
+
+            <!-- STREAMING -->
+            <div class="g-section">
+                <div class="g-section-title">🎧 Métricas de Streaming (Spotify)</div>
+
+                <div class="g-item">
+                    <div class="g-term"><span class="g-dot" style="background:#1db954;"></span> Streams <span class="g-tag g-tag-stream">SPOTIFY</span></div>
+                    <div class="g-def">Cada vez que alguien reproduce una canción por más de 30 segundos. Es la unidad básica de consumo musical.</div>
+                    <div class="g-example">↗ Más streams = más gente escuchando tus canciones</div>
+                </div>
+
+                <div class="g-item">
+                    <div class="g-term"><span class="g-dot" style="background:#1db954;"></span> Listeners</div>
+                    <div class="g-def">Personas únicas que escucharon al menos una canción hoy. Un listener puede generar muchos streams.</div>
+                    <div class="g-example">100 listeners con 3 streams cada uno = 300 streams</div>
+                </div>
+
+                <div class="g-item">
+                    <div class="g-term"><span class="g-dot" style="background:#1db954;"></span> Monthly Listeners</div>
+                    <div class="g-def">Total de personas únicas que te escucharon en los últimos 28 días. Es la métrica principal que muestra Spotify en tu perfil.</div>
+                </div>
+
+                <div class="g-item">
+                    <div class="g-term"><span class="g-dot" style="background:#a855f7;"></span> Saves</div>
+                    <div class="g-def">Cuando alguien guarda tu canción en su biblioteca. Es la señal más fuerte de que le gustó y quiere volver a escucharla. Spotify usa esto para recomendar tu música a más gente.</div>
+                    <div class="g-example">↗ Los saves son MÁS valiosos que los streams para el algoritmo</div>
+                </div>
+
+                <div class="g-item">
+                    <div class="g-term"><span class="g-dot" style="background:#a855f7;"></span> Playlist Adds</div>
+                    <div class="g-def">Cuando alguien añade tu canción a una playlist. Multiplica tu alcance porque otros usuarios de esa playlist también la escucharán.</div>
+                </div>
+
+                <div class="g-item">
+                    <div class="g-term"><span class="g-dot" style="background:#1db954;"></span> Followers</div>
+                    <div class="g-def">Personas que siguen tu perfil de artista. Reciben notificaciones cuando lanzas música nueva.</div>
+                </div>
+            </div>
+
+            <!-- SOCIAL -->
+            <div class="g-section">
+                <div class="g-section-title">📱 Métricas de Redes Sociales</div>
+
+                <div class="g-item">
+                    <div class="g-term"><span class="g-dot" style="background:#e1306c;"></span> IG Reach <span class="g-tag g-tag-social">INSTAGRAM</span></div>
+                    <div class="g-def">Personas únicas que vieron tu contenido. No importa si interactuaron o no — simplemente les apareció en pantalla.</div>
+                </div>
+
+                <div class="g-item">
+                    <div class="g-term"><span class="g-dot" style="background:#e1306c;"></span> IG Views</div>
+                    <div class="g-def">Veces totales que se reprodujo tu contenido de video (Reels, Stories). Una persona puede verlo varias veces.</div>
+                </div>
+
+                <div class="g-item">
+                    <div class="g-term"><span class="g-dot" style="background:#e1306c;"></span> IG Interactions</div>
+                    <div class="g-def">Suma de likes, comentarios, guardados y compartidos. Indica qué tanto la gente se involucra con tu contenido.</div>
+                </div>
+
+                <div class="g-item">
+                    <div class="g-term"><span class="g-dot" style="background:#00f2ea;"></span> TikTok Video Views <span class="g-tag g-tag-social">TIKTOK</span></div>
+                    <div class="g-def">Reproducciones totales del video. TikTok cuenta una view apenas el video aparece, sin mínimo de tiempo.</div>
+                </div>
+
+                <div class="g-item">
+                    <div class="g-term"><span class="g-dot" style="background:#00f2ea;"></span> TikTok Likes / Comments / Shares</div>
+                    <div class="g-def">Interacciones directas en TikTok. Los shares y comentarios son las señales más fuertes para que el algoritmo distribuya más tu video.</div>
+                </div>
+            </div>
+
+            <!-- BENCHMARKS -->
+            <div class="g-section">
+                <div class="g-section-title">📊 Benchmarks (Líneas de Referencia)</div>
+
+                <div class="g-item">
+                    <div class="g-term"><span class="g-dot" style="background:var(--gold);"></span> Promedio (AVG)</div>
+                    <div class="g-def">El valor promedio de esa métrica durante el mes en curso. Sirve para saber si hoy fue un día "normal" o especial.</div>
+                    <div class="g-example">Si tu promedio de streams es 380 y hoy hiciste 500, fue un buen día</div>
+                </div>
+
+                <div class="g-item">
+                    <div class="g-term"><span class="g-dot" style="background:var(--sa);"></span> P90 (Percentil 90)</div>
+                    <div class="g-def">El umbral que solo el 10% de tus mejores días alcanza. Si superas P90, fue un día excepcional. Es la línea roja punteada en las gráficas.</div>
+                    <div class="g-example">P90 de 441 streams → solo el 10% de los días superas esa cifra</div>
+                </div>
+
+                <div class="g-item">
+                    <div class="g-term"><span class="g-dot" style="background:var(--pt);"></span> P10 (Percentil 10)</div>
+                    <div class="g-def">El umbral de los peores días. Si estás por debajo de P10, algo anda mal (catálogo inactivo, canción eliminada de playlist, etc).</div>
+                </div>
+            </div>
+
+            <!-- CONTENT SCORES -->
+            <div class="g-section">
+                <div class="g-section-title">🏆 Puntuación de Contenido Social</div>
+
+                <div class="g-item">
+                    <div class="g-term"><span class="g-dot" style="background:var(--gold);"></span> WScore <span class="g-tag g-tag-score">CALCULADO</span></div>
+                    <div class="g-def">Puntuación ponderada de un post social que valora las interacciones de mayor calidad. Los guardados y compartidos pesan más que los likes porque indican intención real.</div>
+                </div>
+
+                <div class="g-item">
+                    <div class="g-term"><span class="g-dot" style="background:var(--gold);"></span> Eficiencia</div>
+                    <div class="g-def">WScore dividido entre las visualizaciones. Mide cuánta interacción de calidad genera cada view. Un post con menos views pero alta eficiencia es MÁS valioso que uno viral sin engagement.</div>
+                    <div class="g-example">Eficiencia > 0.30 = excelente · > 0.15 = buena · < 0.15 = baja</div>
+                </div>
+
+                <div class="g-item">
+                    <div class="g-term"><span class="g-dot" style="background:var(--gold);"></span> Save Rate</div>
+                    <div class="g-def">Porcentaje de gente que guardó el post vs. cuánta lo vio. Un save rate alto significa que el contenido tiene valor para regresar a él.</div>
+                </div>
+
+                <div class="g-item">
+                    <div class="g-term"><span class="g-dot" style="background:var(--sa);"></span> Categorías de Contenido</div>
+                    <div class="g-def">
+                        <strong>🦄 UNICORNIO</strong> — Eficiencia > 0.50. Top content. Replicar este formato.<br>
+                        <strong>💎 PIEDRA ANGULAR</strong> — Eficiencia 0.30–0.50. Contenido sólido que funciona.<br>
+                        <strong>✅ CUMPLE</strong> — Eficiencia 0.15–0.30. Aceptable, mantiene presencia.<br>
+                        <strong>📉 RUIDO</strong> — Eficiencia < 0.15. No conectó con la audiencia.
+                    </div>
+                </div>
+            </div>
+
+            <!-- INSIGHTS -->
+            <div class="g-section">
+                <div class="g-section-title">🧠 Insights — Qué Significan</div>
+
+                <div class="g-item">
+                    <div class="g-term"><span class="g-dot" style="background:var(--pt);"></span> Echo Insight <span class="g-tag g-tag-ai">INSIGHT</span></div>
+                    <div class="g-def">Analiza la relación entre redes sociales y streaming con una ventana de 5-10 días. Detecta si un pico de streams vino de contenido social publicado hace una semana (el "Modelo Invertido"). Te dice <strong>por qué</strong> subieron o bajaron tus streams.</div>
+                    <div class="g-example">Si suben los streams → mira qué publicaste hace 5-10 días, ese fue el detonante</div>
+                </div>
+
+                <div class="g-item">
+                    <div class="g-term"><span class="g-dot" style="background:var(--green);"></span> Echo Pulse <span class="g-tag g-tag-ai">INSIGHT</span></div>
+                    <div class="g-def">Foto instantánea del momento: compara las métricas de HOY contra el promedio. Detecta si hay impacto directo en las primeras 0-72 horas después de publicar en redes.</div>
+                    <div class="g-example">Publicaste un Reel ayer → Echo Pulse muestra si ya hay eco en streams hoy</div>
+                </div>
+
+                <div class="g-item">
+                    <div class="g-term"><span class="g-dot" style="background:var(--gold);"></span> Content Score <span class="g-tag g-tag-ai">INSIGHT</span></div>
+                    <div class="g-def">Evaluación automática de cada post social. Analiza su eficiencia, predice su impacto en streams (inmediato y a 10 días), detecta el tono emocional, y da una directriz clara: repetir, ajustar, o descartar ese formato.</div>
+                </div>
+
+                <div class="g-item">
+                    <div class="g-term"><span class="g-dot" style="background:var(--sa);"></span> Estados del Diagnóstico</div>
+                    <div class="g-def">
+                        <strong>⚡ SPIKE DUAL</strong> — Redes Y streaming subieron juntos. Máxima conexión.<br>
+                        <strong>📈 SPIKE STREAMING</strong> — Solo subieron streams. Buscar causa en playlist o contenido previo.<br>
+                        <strong>📱 SPIKE SOCIAL</strong> — Solo subieron redes. El eco en streaming llegará en 0-72h o 5-10 días.<br>
+                        <strong>📊 DÍA BASE</strong> — Todo normal. Mantener cadencia de publicación.<br>
+                        <strong>🔇 SILENCIO</strong> — Actividad social baja. No se espera impacto en streaming.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+    function switchView(btn, url) {
+        // Update active tab
+        document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        // Show loader, switch iframe
+        const loader = document.getElementById('iframeLoader');
+        loader.classList.remove('hidden');
+        document.querySelector('.airtable-embed').src = url;
+    }
+
+    function toggleTheme() {
+        const html = document.documentElement;
+        html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+    }
+
+    function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            document.body.requestFullscreen();
+        } else {
+            document.exitFullscreen();
+        }
+    }
+
+    function openGlossary() {
+        document.getElementById('glossaryOverlay').classList.add('open');
+        document.getElementById('glossaryPanel').classList.add('open');
+    }
+
+    function closeGlossary() {
+        document.getElementById('glossaryOverlay').classList.remove('open');
+        document.getElementById('glossaryPanel').classList.remove('open');
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeGlossary();
+    });
+    </script>
+</body>
+</html>
