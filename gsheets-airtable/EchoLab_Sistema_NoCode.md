@@ -327,3 +327,28 @@ Este es el proceso completo que seguirá tu equipo cada vez que haya datos nuevo
 
 ### Regla de oro de Data Fetcher:
 > **Cada vez que añadas una columna nueva en Google Sheets, tienes que ir a Data Fetcher → Edit field mapping → activar esa columna → asignarle un destino en Airtable.** Data Fetcher NO detecta columnas nuevas automáticamente. Si no la mapeas, no la jala, aunque diga "Success".
+
+---
+
+## 8. DASHBOARD WEB (Visualización para el Equipo)
+
+El archivo `dashboard.html` embebe las interfaces de Airtable en un wrapper con branding EchoLab. Está publicado en GitHub Pages.
+
+### URL de acceso:
+**https://monixette.github.io/echolab/gsheets-airtable/dashboard.html**
+
+### Funcionalidades:
+- **Tabs de vista**: Alterna entre "Data Visualization" (gráficas de línea + insights) y "Content Score" (evaluación por post).
+- **Glosario**: Botón 📖 que abre un panel lateral explicando cada métrica y cada insight en lenguaje humano.
+- **Dark / Light mode**: Toggle en el topbar.
+- **Refresh**: Recarga los datos de Airtable sin salir de la página.
+- **Expandir**: Fullscreen para presentaciones.
+
+### Requisito técnico:
+El embed de Airtable solo funciona cuando la página se sirve desde HTTP (un servidor), no desde `file://`. GitHub Pages cumple con esto automáticamente. Para desarrollo local:
+```bash
+cd echolab/gsheets-airtable
+python3 -m http.server 8888
+# Abrir: http://localhost:8888/dashboard.html
+```
+
